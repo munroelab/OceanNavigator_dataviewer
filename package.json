@@ -1,0 +1,19 @@
+{
+  "name": "oceannavigator_dataviewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "dependencies": {
+    "ol": "^6.2.1",
+    "parcel-bundler": "^1.12.4",
+    "parcel": "1.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    
+    "start": "parcel index.html",
+    "build": "parcel build --experimental-scope-hoisting --public-url . index.html"
+  },
+  "author": "",
+  "license": "ISC"
+}
