@@ -12,6 +12,7 @@ var map = new ol.Map({
     })
   });
 
+
 //dataset and variables drop downs
 
 let dropdown = document.getElementById('dataset-form');
@@ -25,7 +26,6 @@ dropdown.selectedIndex = 0;
 
 //getting the list of stations
 const url = 'https://cioosatlantic.ca/ckan/api/3/action/package_list';
-console.log("the url:", url)
 
 fetch(url)  
   .then(  
@@ -54,7 +54,7 @@ fetch(url)
   var eve = document.getElementById('dataset-form');
   
   //generate a drop down of variables belong to selected dataset by user
-  eve.addEventListener("click", function GetSelectedValue(){
+  eve.addEventListener("click", function getSelectedValue(){
     let variableDropdown = document.getElementById('variable-form');
     variableDropdown.length = 0;
 
@@ -67,7 +67,7 @@ fetch(url)
     var station = eve.options[eve.selectedIndex].value;
     var  stationData= fetchData(station);
 
-    console.log("station-name: ", station);
+    //getting the data of the selected station
     fetch("https://cioosatlantic.ca/ckan/api/3/action/package_show?id=" + station )  
     .then(  
     function(response) {  
@@ -82,6 +82,7 @@ fetch(url)
           const variable= data.result.keywords.fr;
           let option;
 
+        //generates the variables of selected dataset in the dropdown
         for (let i = 0; i < variable.length; i++) {
             option = document.createElement('option');
             option.text =variable[i];
@@ -113,14 +114,15 @@ function fetchData(station){
 
 }
 
+
 //Function to handle data
 function handleData(data, station) {
+  
     console.log("clean data: ",data);
     data.forEach(row=>{
         if (row['datasetID'].toLowerCase()===station){
             coords = [row['minLatitude'], row['minLongitude']]
-            name=row['datasetID']
-            console.log("coords:", name);  
+            name=row['datasetID'] 
 
             //adding marker for each station 
             var marker = new ol.layer.Vector({
@@ -132,33 +134,57 @@ function handleData(data, station) {
                     ]
                 })
             });
-
+  
             marker.setStyle(new ol.style.Style({
                 image: new ol.style.Icon(({
                     crossOrigin: 'anonymous',
                     src: 'dot.png'
                 }))
             }));
-
-            map.addLayer(marker);
-                
-           
             
-                //function to open the popup when click on it
-            map.on('singleclick', function (event) {
+            map.addLayer(marker);
+
+            //function to open the popup when click on it
+            map.on('click', function (event) {
                 if (map.hasFeatureAtPixel(event.pixel) === true) {
                     var coordinate = event.coordinate;
-
                     content.innerHTML ='station name: '+ station + ' coordination: '  + coordinate ;
                     var btn= document.createElement("BUTTON");
-                    btn.id="btn";
+                    var btn1= document.createElement("BUTTON");
+                    var removeMarkerBtn= document.createElement("BUTTON");
+                    btn.className="btn";
                     btn.innerHTML= "Show more";
+                    btn1.className="btn";
+                    btn1.innerHTML="Show less";
+                    removeMarkerBtn.className="btn";
+                    removeMarkerBtn.innerHTML="Remove marker";
                     content.appendChild(btn);
-                    btn.addEventListener("click", function onClickButton(){
-                    var desc= document.getElementById("summary");
-                    desc.innerHTML= row['summary'];
-                    content.appendChild(desc) ;
-                    });
+                    content.appendChild(removeMarkerBtn);
+
+                    btn.addEventListener('click', function onClickButton(){
+                        var desc=document.createElement("div");
+                        desc.id="summary1";
+                        console.log("description:", row['summary'], "desc:", desc);
+                        desc.innerHTML= row['summary'];
+                        content.appendChild(desc) ;
+                        content.appendChild(btn1);
+                        removeEventListener('click',onClickButton);
+                        
+                      }); 
+                    btn1.addEventListener('click', function addHandler(){
+                        var desc1= document.getElementById("summary1");
+                        desc1.innerHTML= ' ';
+                        content.appendChild(desc1) ;
+                        content.removeChild(btn1);
+                        content.removeChild(desc1);
+                        });
+                    
+                    removeMarkerBtn.addEventListener('click', function removeMarker(){
+                        map.removeLayer(marker);
+                        
+                       
+                    } );
+
                     overlay.setPosition(coordinate);  
                 } else {
                     overlay.setPosition(undefined);
