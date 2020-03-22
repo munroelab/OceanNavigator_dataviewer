@@ -1,16 +1,25 @@
-#root {
-  max-width: 1200px;
-  margin: 0 auto;
+.root {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
 }
 
 #map {
-  height: 80%;
-  width: 80%;
-  float: right;
   
-}
+  align-self: flex-start;
+  height: 100%;
+  width: 100%; 
+  order:2;
+} 
+
+.panel-primary {
+  order: 1;
+  align-self: flex-end;
+} 
 
 .ol-popup {
+ 
   position: absolute;
   background-color: white;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
@@ -41,7 +50,7 @@
   border-width: 11px;
   left: 48px;
   margin-left: -11px;
-}
+} 
 .ol-popup-closer {
   text-decoration: none;
   position: absolute;
@@ -50,12 +59,6 @@
 }
 .ol-popup-closer:after {
   content: "✖";
-}
-
-.panel-primary {
- 
-  display: flex;
-
 }
 
 .navbar {
@@ -73,13 +76,8 @@
 }
 
 .form-control {
-  display: block;
   font-size: 15px;
-  line-height: 1.4;
-  padding: 8px 10px;
-  color:  #6f6f6f;
-  height: auto;
-  width: 5cm;
+  color:  #64808b;
 }
 
 div.input {
@@ -90,14 +88,12 @@ div.input {
 
 .combo-box {
 border: 3px solid;
-padding-right: 1cm;
-margin-right: 1.5cm;
+margin-right: 0.5cm;
 border-color:#008cba;
 }
 
 #dataset-form, #variable-form {
-
-width: 160px;
+width: 180px;
 height: auto;
 margin: 10px;
 }
@@ -124,6 +120,5 @@ margin-left: 0.5cm;
 
 #summary{
   font-size: small;
-
 }
 

@@ -8,9 +8,10 @@
     "parcel-bundler": "^1.12.4",
     "parcel": "1.11.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier": "^2.0.1"
+  },
   "scripts": {
-    
     "start": "parcel index.html",
     "build": "parcel build --experimental-scope-hoisting --public-url . index.html"
   },
