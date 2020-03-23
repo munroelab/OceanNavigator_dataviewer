@@ -1,5 +1,25 @@
+var raster = new ol.layer.Tile({
+  source: new ol.source.OSM()
+});
+
+var source = new ol.source.Vector({wrapX: false});
+
+var vector = new ol.layer.Vector({
+  source: source
+});
+
 //creating the map
 var map = new ol.Map({
+  layers: [raster, vector],
+  target: 'map',
+  view: new ol.View({
+    center: ol.proj.fromLonLat([-52.707546, 47.562509]),
+    zoom: 4
+  })
+});
+
+
+/* var map = new ol.Map({
   target: "map",
   layers: [
     new ol.layer.Tile({
@@ -10,7 +30,7 @@ var map = new ol.Map({
     center: ol.proj.fromLonLat([-52.707546, 47.562509]), // Coordinates of St. John's
     zoom: 4 //Initial Zoom Level
   })
-});
+}); */
 
 //creating drop downs for datasets and variables
 
@@ -212,3 +232,29 @@ closer.onclick = function () {
   closer.blur();
   return false;
 };
+
+//function to draw on map
+var typeSelect = document.getElementById('type');
+
+var draw; // global so we can remove it later
+function addInteraction() {
+  var value = typeSelect.value;
+  if (value !== 'None') {
+    draw = new ol.interaction.Draw({
+      source: source,
+      type: typeSelect.value
+    });
+    map.addInteraction(draw);
+  }
+}
+
+
+/**
+ * Handle change event.
+ */
+typeSelect.onchange = function() {
+  map.removeInteraction(draw);
+  addInteraction();
+};
+
+addInteraction();

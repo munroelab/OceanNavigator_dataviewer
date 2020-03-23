@@ -1,47 +1,58 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css"
+      type="text/css"
+    />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
 
-<head>
-    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
-     <link rel="stylesheet" type="text/css" href="style.css">
-</head>
-
-<body>
+  <body>
     <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
 
     <nav class="nabvar navbar-inverse"></nav>
     <div class="root">
-        <div id="map"></div>
-        <div id="popup" class="ol-popup">
-            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-            <div id="popup-content"></div>
+      <div id="map"></div>
+      <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>
+      </div>
+
+      <div class="panel-primary">
+        <div class="combo-box input">
+
+        </h3>
+        
+          <h3 class="h3s">
+            Draw on Map 
+          <select id="type" class="form-control" size="1" >
+            <option value="None">None</option>
+            <option value="Point">Point</option>
+            <option value="Polygon">Polygon</option>
+            <option value="Circle">Circle</option>
+          </select>
+        </h3>
+
+          <h3 class="h3s">
+            Dataset
+            <select class="form-control" id="dataset-form" size="1"></select>
+          </h3>
+
+          <h3 class="h3s">
+            Variable
+            <select class="form-control" id="variable-form" size="1"> </select>
+          </h3>
+
+          <h3 class="h3s">
+            Time (UTC)
+            <input value="15 March 2020" />
+          
         </div>
-
-        <div class="panel-primary">
-            <div class="combo-box input">
-                <h3 class="h3s">
-                    Dataset
-                    <select class="form-control" id="dataset-form" size="1"></select>            
-                </h3>
-
-                <h3 class="h3s">
-                    Variable
-                    <select class="form-control" id="variable-form" size="1">
-                    </select>
-                </h3>
-
-                <h3 class="h3s">
-                    Time (UTC)
-                    <input value="15 March 2020">
-                            
-                </h3>
-
-            </div>
-        </div>
+      </div>
     </div>
 
-
     <script src="script.js"></script>
-
-</body>
+  </body>
 </html>

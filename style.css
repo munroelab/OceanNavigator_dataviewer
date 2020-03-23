@@ -1,3 +1,4 @@
+
 .root {
   display: flex;
   justify-content: flex-start;
@@ -6,23 +7,21 @@
 }
 
 #map {
-  
   align-self: flex-start;
   height: 100%;
-  width: 100%; 
-  order:2;
-} 
+  width: 100%;
+  order: 2;
+}
 
 .panel-primary {
   order: 1;
   align-self: flex-end;
-} 
+}
 
 .ol-popup {
- 
   position: absolute;
   background-color: white;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   padding: 15px;
   border-radius: 10px;
   border: 1px solid #cccccc;
@@ -30,7 +29,8 @@
   left: -50px;
   min-width: 280px;
 }
-.ol-popup:after, .ol-popup:before {
+.ol-popup:after,
+.ol-popup:before {
   top: 100%;
   border: solid transparent;
   content: " ";
@@ -50,7 +50,7 @@
   border-width: 11px;
   left: 48px;
   margin-left: -11px;
-} 
+}
 .ol-popup-closer {
   text-decoration: none;
   position: absolute;
@@ -66,59 +66,59 @@
   font-size: 16px !important;
   position: relative;
   min-height: 45px;
-
 }
 
 .navbar-inverse {
-  background-color: 
-  #008cba;
+  background-color: #008cba;
   border-color: #006687;
 }
 
 .form-control {
   font-size: 15px;
-  color:  #64808b;
+  color: #64808b;
 }
 
 div.input {
-  padding-bottom: .5em;
-  padding-right: 1cm;  
+  padding-bottom: 0.5em;
+  padding-right: 1cm;
   height: 13cm;
 }
 
 .combo-box {
-border: 3px solid;
-margin-right: 0.5cm;
-border-color:#008cba;
+  border: 3px solid;
+  margin-right: 0.5cm;
+  border-color: #008cba;
 }
 
-#dataset-form, #variable-form {
-width: 180px;
-height: auto;
-margin: 10px;
+#dataset-form,
+#variable-form,
+#type {
+  width: 180px;
+  height: auto;
+  margin: 10px;
 }
 
-.h3s{
-margin-left: 0.5cm;
+.h3s {
+  margin-left: 0.5cm;
 }
 
-.button{
+.button {
   width: 2cm;
   height: 2cm;
 }
 
-#popup{
+#popup {
   width: auto;
   height: auto;
 }
 
-.btn{
-   border: 0ch;
-   margin-top: 0.5cm; 
-   margin-bottom: 0.5cm; 
+.btn {
+  border: 0ch;
+  margin-top: 0.5cm;
+  margin-bottom: 0.5cm;
 }
 
-#summary{
+#summary {
   font-size: small;
 }
 
