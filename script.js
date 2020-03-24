@@ -2,35 +2,23 @@ var raster = new ol.layer.Tile({
   source: new ol.source.OSM()
 });
 
-var source = new ol.source.Vector({wrapX: false});
+var source = new ol.source.Vector({ wrapX: false });
 
 var vector = new ol.layer.Vector({
   source: source
 });
 
+console.log("Vectore:", raster);
+
 //creating the map
 var map = new ol.Map({
   layers: [raster, vector],
-  target: 'map',
+  target: "map",
   view: new ol.View({
     center: ol.proj.fromLonLat([-52.707546, 47.562509]),
     zoom: 4
   })
 });
-
-
-/* var map = new ol.Map({
-  target: "map",
-  layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
-    })
-  ],
-  view: new ol.View({
-    center: ol.proj.fromLonLat([-52.707546, 47.562509]), // Coordinates of St. John's
-    zoom: 4 //Initial Zoom Level
-  })
-}); */
 
 //creating drop downs for datasets and variables
 
@@ -83,7 +71,7 @@ eve.addEventListener("click", function getSelectedValue() {
   variableDropdown.selectedIndex = 0;
 
   var station = eve.options[eve.selectedIndex].value;
-  var stationData = fetchData(station);
+  fetchData(station);
 
   //getting the data of the selected station
   fetch(
@@ -134,35 +122,12 @@ function fetchData(station) {
 
 //function to retrieve info from fetched data
 function handleData(data, station) {
+  console.log("fetched data:", data);
   data.forEach(row => {
     if (row["datasetID"].toLowerCase() === station) {
       coords = [row["minLatitude"], row["minLongitude"]];
       name = row["datasetID"];
-
-      //adding marker for each station
-      var marker = new ol.layer.Vector({
-        source: new ol.source.Vector({
-          features: [
-            new ol.Feature({
-              geometry: new ol.geom.Point(
-                ol.proj.fromLonLat([coords[1], coords[0]])
-              )
-            })
-          ]
-        })
-      });
-
-      marker.setStyle(
-        new ol.style.Style({
-          image: new ol.style.Icon({
-            crossOrigin: "anonymous",
-            src: "dot.png"
-          })
-        })
-      );
-
-      map.addLayer(marker);
-
+      makeMarker(coords);
       //function to open the popup when click on it
       map.on("click", function (event) {
         if (map.hasFeatureAtPixel(event.pixel) === true) {
@@ -202,9 +167,9 @@ function handleData(data, station) {
             map.removeLayer(marker);
           });
 
-          overlay.setPosition(coordinate);
+          popup.setPosition(coordinate);
         } else {
-          overlay.setPosition(undefined);
+          popup.setPosition(undefined);
           closer.blur();
         }
       });
@@ -212,12 +177,38 @@ function handleData(data, station) {
   });
 }
 
+//function to make marker getting coordinates
+function makeMarker(coords) {
+  //adding marker for each station
+  var marker = new ol.layer.Vector({
+    source: new ol.source.Vector({
+      features: [
+        new ol.Feature({
+          geometry: new ol.geom.Point(
+            ol.proj.fromLonLat([coords[1], coords[0]])
+          )
+        })
+      ]
+    })
+  });
+
+  marker.setStyle(
+    new ol.style.Style({
+      image: new ol.style.Icon({
+        crossOrigin: "anonymous",
+        src: "dot.png"
+      })
+    })
+  );
+  map.addLayer(marker);
+}
+
 //initialize the popup
 var container = document.getElementById("popup");
 var content = document.getElementById("popup-content");
 var closer = document.getElementById("popup-closer");
 
-var overlay = new ol.Overlay({
+var popup = new ol.Overlay({
   element: container,
   autoPan: true,
   autoPanAnimation: {
@@ -225,36 +216,55 @@ var overlay = new ol.Overlay({
   }
 });
 
-map.addOverlay(overlay);
+map.addOverlay(popup);
 
 closer.onclick = function () {
-  overlay.setPosition(undefined);
+  popup.setPosition(undefined);
   closer.blur();
   return false;
 };
 
 //function to draw on map
-var typeSelect = document.getElementById('type');
+var typeSelect = document.getElementById("type");
 
 var draw; // global so we can remove it later
 function addInteraction() {
   var value = typeSelect.value;
-  if (value !== 'None') {
+  if (value !== "None") {
     draw = new ol.interaction.Draw({
       source: source,
       type: typeSelect.value
     });
     map.addInteraction(draw);
+    findCoords();
   }
 }
 
-
-/**
- * Handle change event.
- */
-typeSelect.onchange = function() {
+// Handle change event.
+typeSelect.onchange = function () {
   map.removeInteraction(draw);
   addInteraction();
 };
 
 addInteraction();
+
+//function to show the coordinated of each point on the map
+function onMouseMove(browserEvent) {
+  var coordinate = browserEvent.coordinate;
+  //reformat coordinates
+  coordinate = [coordinate[1].toFixed(2), coordinate[0].toFixed(2)];
+  coordinateDisplayer = document.getElementById("coo-display");
+  coordinateDisplayer.value = coordinate;
+  //var pixel = map.getPixelFromCoordinate(coordinate);
+}
+
+map.on("pointermove", onMouseMove);
+
+//function to get the coordinates of a drawn polygan
+function findCoords(){
+source.on("addfeature", function (evt) {
+  var feature = evt.feature;
+  var coords = feature.getGeometry().getCoordinates();
+  console.log("coordinationf of vertices:", coords);
+});
+}
