@@ -7,16 +7,32 @@
       type="text/css"
     />
     <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   </head>
 
   <body>
     <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
 
-    <nav class="nabvar navbar-inverse"></nav>
-    <div class="root">
-      <div id="map">
-        <input id="coo-display" >
+    <nav class="navbar navbar-inverse navbar-fixed-top" >
+      <div class="container-fluid" style="background-color: #008cba;">
+        <div class="navbar-header" >
+          <a class="navbar-brand" style="color:white;" href="#"> Ocean Navigator Data Viewer </a>
+        </div>
+        <ul class="nav navbar-nav">
+          <!--<li class="active"><a href="#">Home</a></li> -->
+          <!--  <li><a href="#">Page 1</a></li>
+          <li><a href="#">Page 2</a></li>
+          <li><a href="#">Page 3</a></li> -->
+        </ul>
       </div>
+    </nav>
+
+    <div class="root">
+      <div id="map-container">
+      <div id="map">
+      </div>
+      <input id="coo-display" class="input-coordination" >
+    </div>
       <div id="popup" class="ol-popup">
         <a href="#" id="popup-closer" class="ol-popup-closer"></a>
         <div id="popup-content"></div>

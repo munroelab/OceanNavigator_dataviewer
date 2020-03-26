@@ -8,7 +8,7 @@ var vector = new ol.layer.Vector({
   source: source
 });
 
-console.log("Vectore:", raster);
+console.log("Vector:", raster);
 
 //creating the map
 var map = new ol.Map({
@@ -124,9 +124,10 @@ function fetchData(station) {
 function handleData(data, station) {
   console.log("fetched data:", data);
   data.forEach(row => {
+    //Check if the station ID (dataset) selected by user
+    // is among station IDs in ERDAP 
     if (row["datasetID"].toLowerCase() === station) {
       coords = [row["minLatitude"], row["minLongitude"]];
-      name = row["datasetID"];
       makeMarker(coords);
       //function to open the popup when click on it
       map.on("click", function (event) {
@@ -236,12 +237,24 @@ function addInteraction() {
       type: typeSelect.value
     });
     map.addInteraction(draw);
-    findCoords();
+    let coordsPoly=findCoords();
+    /* console.log("coordpoly",coordsPoly);
+    // makeMarker(coords);
+    draw.on('drawend', function (event) {
+      if (map.hasFeatureAtPixel(event.pixel) === true) {
+      console.log("its drawn");
+        var coordinate = event.coordinate;
+        console.log("coordinates of event:", coordinate)
+        content.innerHTML ="list of stations:";
+        popup.setPosition(coordinate);
+      }
+      }); */
   }
 }
 
 // Handle change event.
 typeSelect.onchange = function () {
+  vector.getSource().clear(); //Remove the previous interaction 
   map.removeInteraction(draw);
   addInteraction();
 };
@@ -262,9 +275,9 @@ map.on("pointermove", onMouseMove);
 
 //function to get the coordinates of a drawn polygan
 function findCoords(){
-source.on("addfeature", function (evt) {
-  var feature = evt.feature;
-  var coords = feature.getGeometry().getCoordinates();
-  console.log("coordinationf of vertices:", coords);
-});
+  source.on("addfeature", function (evt) {
+    var feature = evt.feature;
+   var coords = feature.getGeometry().getCoordinates();
+    console.log("coordination of vertices:", coords);
+  });
 }

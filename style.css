@@ -3,19 +3,30 @@
   justify-content: flex-start;
   align-items: flex-start;
   align-content: flex-start;
-}
+  margin-top:50px
+  }
 
-#map {
+#map-container{
   align-self: flex-start;
+  color: #64808b;
+  background-color: #008cba;
   height: 100%;
   width: 100%;
-  order: 2;
-  
+  order:2;
 }
 
+#map{
+  align-self: center;
+}
+
+.input-coordination{
+  background-color: #008cba;
+  color: white;
+}
 .panel-primary {
   order: 1;
   align-self: flex-end;
+
 }
 
 .ol-popup {
@@ -61,18 +72,6 @@
   content: "✖";
 }
 
-.navbar {
-  margin-bottom: 0;
-  font-size: 16px !important;
-  position: relative;
-  min-height: 45px;
-}
-
-.navbar-inverse {
-  background-color: #008cba;
-  border-color: #006687;
-}
-
 .form-control {
   font-size: 15px;
   color: #64808b;
@@ -87,6 +86,7 @@ div.input {
 .combo-box {
   border: 3px solid;
   margin-right: 0.5cm;
+  margin-left: 0.25cm;
   border-color: #008cba;
 }
 
@@ -100,6 +100,8 @@ div.input {
 
 .h3s {
   margin-left: 0.5cm;
+  font-size: small;
+  font-weight: 700;
 }
 
 .button {
