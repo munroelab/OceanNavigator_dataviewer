@@ -91,11 +91,11 @@ div.input {
 }
 
 #dataset-form,
-#variable-form,
-#type {
+#variable-form {
   width: 180px;
   height: auto;
   margin: 10px;
+  
 }
 
 .h3s {
@@ -128,3 +128,8 @@ div.input {
   width: 5cm;
 
 }
+
+button{
+  color: #008cba;
+  }
+

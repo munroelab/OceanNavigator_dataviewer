@@ -1,11 +1,11 @@
 var raster = new ol.layer.Tile({
-  source: new ol.source.OSM()
+  source: new ol.source.OSM(),
 });
 
 var source = new ol.source.Vector({ wrapX: false });
 
 var vector = new ol.layer.Vector({
-  source: source
+  source: source,
 });
 
 console.log("Vector:", raster);
@@ -16,8 +16,8 @@ var map = new ol.Map({
   target: "map",
   view: new ol.View({
     center: ol.proj.fromLonLat([-52.707546, 47.562509]),
-    zoom: 4
-  })
+    zoom: 4,
+  }),
 });
 
 //creating drop downs for datasets and variables
@@ -104,28 +104,28 @@ function fetchData(station) {
   fetch(
     "https://www.smartatlantic.ca/erddap/tabledap/allDatasets.json?datasetID%2Caccessible%2Cinstitution%2CdataStructure%2Ccdm_data_type%2Cclass%2Ctitle%2CminLongitude%2CmaxLongitude%2ClongitudeSpacing%2CminLatitude%2CmaxLatitude%2ClatitudeSpacing%2CminAltitude%2CmaxAltitude%2CminTime%2CmaxTime%2CtimeSpacing%2Cgriddap%2Csubset%2Ctabledap%2CMakeAGraph%2Csos%2Cwcs%2Cwms%2Cfiles%2Cfgdc%2Ciso19115%2Cmetadata%2CsourceUrl%2CinfoUrl%2Crss%2Cemail%2CtestOutOfDate%2CoutOfDate%2Csummary"
   )
-    .then(response => {
+    .then((response) => {
       return response.json();
     })
-    .then(data => {
+    .then((data) => {
       columnNames = data["table"]["columnNames"];
       dict = [];
-      data["table"]["rows"].slice(1).forEach(rows => {
+      data["table"]["rows"].slice(1).forEach((rows) => {
         var pairs = {};
         columnNames.forEach((columnName, i) => (pairs[columnName] = rows[i]));
         dict.push(pairs);
       });
       return dict;
     })
-    .then(data => handleData(data, station));
+    .then((data) => handleData(data, station));
 }
 
 //function to retrieve info from fetched data
 function handleData(data, station) {
   console.log("fetched data:", data);
-  data.forEach(row => {
+  data.forEach((row) => {
     //Check if the station ID (dataset) selected by user
-    // is among station IDs in ERDAP 
+    // is among station IDs in ERDAP
     if (row["datasetID"].toLowerCase() === station) {
       coords = [row["minLatitude"], row["minLongitude"]];
       makeMarker(coords);
@@ -176,6 +176,8 @@ function handleData(data, station) {
       });
     }
   });
+  dragNewBox(data);
+  // return data;
 }
 
 //function to make marker getting coordinates
@@ -187,18 +189,18 @@ function makeMarker(coords) {
         new ol.Feature({
           geometry: new ol.geom.Point(
             ol.proj.fromLonLat([coords[1], coords[0]])
-          )
-        })
-      ]
-    })
+          ),
+        }),
+      ],
+    }),
   });
 
   marker.setStyle(
     new ol.style.Style({
       image: new ol.style.Icon({
         crossOrigin: "anonymous",
-        src: "dot.png"
-      })
+        src: "dot.png",
+      }),
     })
   );
   map.addLayer(marker);
@@ -213,8 +215,8 @@ var popup = new ol.Overlay({
   element: container,
   autoPan: true,
   autoPanAnimation: {
-    duration: 250
-  }
+    duration: 250,
+  },
 });
 
 map.addOverlay(popup);
@@ -226,42 +228,83 @@ closer.onclick = function () {
 };
 
 //function to draw on map
-var typeSelect = document.getElementById("type");
+// var typeSelect = document.getElementById("type");
 
-var draw; // global so we can remove it later
-function addInteraction() {
+function dragNewBox(data) {
+  /*  var a =coordOfStations();
+  console.log("a",a); */
+  var draw; // global so we can remove it later
+  /* function addInteraction() {
   var value = typeSelect.value;
-  if (value !== "None") {
-    draw = new ol.interaction.Draw({
-      source: source,
-      type: typeSelect.value
-    });
-    map.addInteraction(draw);
-    let coordsPoly=findCoords();
-    /* console.log("coordpoly",coordsPoly);
-    // makeMarker(coords);
-    draw.on('drawend', function (event) {
-      if (map.hasFeatureAtPixel(event.pixel) === true) {
-      console.log("its drawn");
-        var coordinate = event.coordinate;
-        console.log("coordinates of event:", coordinate)
-        content.innerHTML ="list of stations:";
-        popup.setPosition(coordinate);
-      }
-      }); */
-  }
-}
+  if (value !== "None") { */
+  var draw = new ol.interaction.DragBox({
+    condition: ol.events.condition.noModifierKeys,
+    style: new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: [0, 0, 255, 1],
+      }),
+    }),
+  });
 
-// Handle change event.
-typeSelect.onchange = function () {
+  draw.on("boxend", function (evt) {
+    var geom = evt.target.getGeometry();
+    console.log("geom", geom);
+    var feat = new ol.Feature({ geometry: geom });
+    source.addFeature(feat);
+  });
+
+  //shows the stations inside the box
+  draw.on("boxend", function (evt) {
+    var stationsInside = [];
+    console.log("im here");
+    var polygon_extent = draw.getGeometry().extent_;
+    //var polygonGeometry = evt.target.getGeometry();
+    console.log("polygon_extent:", polygon_extent);
+    data.forEach((row) => {
+      coord = ol.proj.fromLonLat([row["minLongitude"], row["minLatitude"]]);
+      if (ol.extent.containsCoordinate(polygon_extent, coord)) {
+        stationsInside.push(row);
+      }
+    });
+    var IDs = [];
+    if (stationsInside.length == 0) {
+      content.innerHTML = "These is no station in selected area!";
+      popup.setPosition(draw.getGeometry().getCoordinates()[0][0]);
+    } else {
+      stationsInside.forEach((row) => {
+        IDs.push(row["datasetID"]);
+        makeMarker([row["minLatitude"], row["minLongitude"]]);
+      });
+      content.innerHTML =
+        "Number of stations: " +
+        stationsInside.length +
+        "<br />" +
+        "list of stations in selected area:" +
+        "<br />" +
+        IDs.toString().split(",").join("<br />");
+      popup.setPosition(
+        ol.proj.fromLonLat([
+          stationsInside[0]["minLongitude"],
+          stationsInside[0]["minLatitude"],
+        ])
+      );
+    }
+  });
+
+  map.addInteraction(draw);
+  let coordsPoly = findCoords();
+
+  // Handle change event.
+  /* typeSelect.onchange = function () {
   vector.getSource().clear(); //Remove the previous interaction 
   map.removeInteraction(draw);
   addInteraction();
 };
 
-addInteraction();
+addInteraction(); */
+}
 
-//function to show the coordinated of each point on the map
+//function to show the coordinates of each point on the map
 function onMouseMove(browserEvent) {
   var coordinate = browserEvent.coordinate;
   //reformat coordinates
@@ -274,10 +317,11 @@ function onMouseMove(browserEvent) {
 map.on("pointermove", onMouseMove);
 
 //function to get the coordinates of a drawn polygan
-function findCoords(){
+function findCoords() {
   source.on("addfeature", function (evt) {
     var feature = evt.feature;
-   var coords = feature.getGeometry().getCoordinates();
+    var coords = feature.getGeometry().getCoordinates();
     console.log("coordination of vertices:", coords);
+    // boundingBox(coords);
   });
 }
