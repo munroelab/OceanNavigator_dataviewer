@@ -87,6 +87,7 @@ eve.addEventListener("click", function getSelectedValue() {
     // Examine the text in the response
     response.json().then(function (data) {
       const variable = data.result.keywords.fr;
+      console.log("variables:", );
       let option;
 
       //generates the variables of selected dataset in the dropdown
@@ -266,6 +267,7 @@ function dragNewBox(data) {
         stationsInside.push(row);
       }
     });
+    console.log("station inside: in draw ", stationsInside )
     var IDs = [];
     if (stationsInside.length == 0) {
       content.innerHTML = "These is no station in selected area!";
@@ -275,15 +277,22 @@ function dragNewBox(data) {
         IDs.push(row["datasetID"]);
         makeMarker([row["minLatitude"], row["minLongitude"]]);
       });
-      content.innerHTML =
+      
+       content.innerHTML =
         "Number of stations: " +
-        stationsInside.length +
-        "<br />" +
+        stationsInside.length 
+        /* "<br />" +
         "list of stations in selected area:" +
         "<br />" +
-        IDs.toString().split(",").join("<br />");
-      popup.setPosition(
-        ol.proj.fromLonLat([
+        IDs.toString().split(",").join("<br />") */; 
+        //Adding a chart to the popup
+        var popupSVGElem = document.createElement("div");
+        var svgNode = createSVG(popupSVGElem,stationsInside[0]["datasetID"]);
+        content.appendChild(svgNode);
+
+        //setting up the position of the popup
+        popup.setPosition(
+          ol.proj.fromLonLat([
           stationsInside[0]["minLongitude"],
           stationsInside[0]["minLatitude"],
         ])
@@ -324,4 +333,117 @@ function findCoords() {
     console.log("coordination of vertices:", coords);
     // boundingBox(coords);
   });
+}
+
+
+function createSVG(popupSVGElem, stationID) {
+  console.log("stationinside:", stationID);
+  // set the dimensions and margins of the graph
+  var margin = {
+      top: 30,
+      right: 20,
+      bottom: 30,
+      left: 40
+    },
+    width = 280 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
+  //console.log(row);
+
+  // append the svg object to the body of the page
+  let svg = d3.select(popupSVGElem)
+    // .append("div")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+      "translate(" + margin.left + "," + margin.top + ")");
+  //return svg.node();
+
+  //Read the data
+
+  let url =dataurl('csv',
+  stationID,
+  'time%2Csurface_temp_avg&time%3E=2017-12-26T00%3A00%3A00Z&time%3C=2018-01-02T09%3A53%3A01Z')
+    console.log("url", url)
+  d3.csv(url,
+    // When reading the csv, I must format variables:
+    function (d) {
+      return {
+        date: d3.utcParse("%Y-%m-%dT%H:%M:%SZ")(d.time),
+        value: d.surface_temp_avg
+      }
+
+    },
+    // Now I can use this dataset:
+    function (error, data) {
+      if (error) {
+        // Handle error
+        console.group('CSV Errors');//******************* */
+        console.error(error);
+        console.groupEnd();
+        return;
+      }
+
+      // Add X axis --> it is a date format
+      var x = d3.scaleTime()
+        .domain(d3.extent(data, function (d) {
+          return d.date;
+        }))
+        .range([0, width]);
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+      // Add Y axis
+      var y = d3.scaleLinear()
+        .domain([0, d3.max(data, function (d) {
+          return +d.value;
+        })])
+        .range([height, 0]);
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      // adding Labels to axises
+      svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "end")
+        .attr("x", width)
+        .attr("y", 250)
+        .text("time");
+
+      svg.append("text")
+        .attr("class", "y label")
+        .attr("text-anchor", "end")
+        .attr("y", -34)
+        .attr("dy", ".75em")
+        .attr("transform", "rotate(-90)")
+        .text("surface-temp-avg");
+
+      // Add the line
+      svg.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+          .x(function (d) {
+            return x(d.date)
+          })
+          .y(function (d) {
+            return y(d.value)
+          })
+          .defined(function (d) {
+            return !isNaN(d.value);
+          })
+        )
+
+    })
+
+  return popupSVGElem;
+}
+
+function dataurl(datatype, stationname, query) {
+  let theurl = `https://www.smartatlantic.ca/erddap/tabledap/${stationname}.${datatype}?${query}`
+  return theurl;
 }
